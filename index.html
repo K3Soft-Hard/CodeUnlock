@@ -1,479 +1,424 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Network Access Gateway</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Network Access Gateway</title>
+  
+  <!-- Cryptography & QR Code Engine -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
-<!-- Cryptography & QR Code Engine -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <style>
+    :root {
+      --bg: #090d16;
+      --card-bg: #111827;
+      --border: #1f2937;
+      --primary: #3b82f6;
+      --primary-hover: #2563eb;
+      --accent: #38bdf8;
+      --text: #f3f4f6;
+      --text-muted: #9ca3af;
+      --danger: #ef4444;
+      --success: #10b981;
+    }
 
-<style>
-:root {
---bg: #090d16;
---card-bg: #111827;
---border: #1f2937;
---primary: #3b82f6;
---primary-hover: #2563eb;
---accent: #38bdf8;
---text: #f3f4f6;
---text-muted: #9ca3af;
---danger: #ef4444;
---success: #10b981;
-}
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+    }
 
-* {
-box-sizing: border-box;
-margin: 0;
-padding: 0;
-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
-}
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
 
-body {
-background-color: var(--bg);
-color: var(--text);
-display: flex;
-align-items: center;
-justify-content: center;
-min-height: 100vh;
-padding: 20px;
-}
+    .container {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      width: 100%;
+      max-width: 440px;
+      padding: 36px 28px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+      text-align: center;
+    }
 
-.container {
-background-color: var(--card-bg);
-border: 1px solid var(--border);
-border-radius: 16px;
-width: 100%;
-max-width: 440px;
-padding: 36px 28px;
-box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
-text-align: center;
-}
+    .header-badge {
+      display: inline-block;
+      font-size: 0.75rem;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      font-weight: 700;
+      padding: 4px 12px;
+      background: #1e293b;
+      color: var(--accent);
+      border-radius: 20px;
+      margin-bottom: 16px;
+      border: 1px solid #334155;
+    }
 
-.header-badge {
-display: inline-block;
-font-size: 0.75rem;
-letter-spacing: 1.5px;
-text-transform: uppercase;
-font-weight: 700;
-padding: 4px 12px;
-background: #1e293b;
-color: var(--accent);
-border-radius: 20px;
-margin-bottom: 16px;
-border: 1px solid #334155;
-}
+    h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      margin-bottom: 8px;
+    }
 
-h1 {
-font-size: 1.5rem;
-font-weight: 700;
-letter-spacing: -0.5px;
-margin-bottom: 8px;
-}
+    p.subtitle {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      line-height: 1.4;
+      margin-bottom: 24px;
+    }
 
-p.subtitle {
-color: var(--text-muted);
-font-size: 0.9rem;
-line-height: 1.4;
-margin-bottom: 24px;
-}
+    .input-wrapper {
+      position: relative;
+      margin-bottom: 16px;
+    }
 
-.input-wrapper {
-position: relative;
-margin-bottom: 16px;
-}
+    input[type="text"] {
+      width: 100%;
+      padding: 16px;
+      background: #030712;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: #fff;
+      font-size: 1.4rem;
+      text-align: center;
+      letter-spacing: 4px;
+      font-variant-numeric: tabular-nums;
+      outline: none;
+      transition: border-color 0.2s;
+    }
 
-input[type="text"] {
-width: 100%;
-padding: 16px;
-background: #030712;
-border: 1px solid var(--border);
-border-radius: 10px;
-color: #fff;
-font-size: 1.4rem;
-text-align: center;
-letter-spacing: 4px;
-font-variant-numeric: tabular-nums;
-outline: none;
-transition: border-color 0.2s;
-}
+    input[type="text"]:focus {
+      border-color: var(--primary);
+    }
 
-input[type="text"]:focus {
-border-color: var(--primary);
-}
+    button {
+      width: 100%;
+      padding: 14px;
+      border-radius: 10px;
+      border: none;
+      background: var(--primary);
+      color: white;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s, opacity 0.2s;
+    }
 
-button {
-width: 100%;
-padding: 14px;
-border-radius: 10px;
-border: none;
-background: var(--primary);
-color: white;
-font-size: 1rem;
-font-weight: 600;
-cursor: pointer;
-transition: background 0.2s, opacity 0.2s;
-}
+    button:hover {
+      background: var(--primary-hover);
+    }
 
-button:hover {
-background: var(--primary-hover);
-}
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
 
-button:disabled {
-opacity: 0.5;
-cursor: not-allowed;
-}
+    .status-msg {
+      margin-top: 14px;
+      font-size: 0.85rem;
+      min-height: 20px;
+    }
 
-.status-msg {
-margin-top: 14px;
-font-size: 0.85rem;
-min-height: 20px;
-}
+    .status-msg.error { color: var(--danger); }
+    .status-msg.success { color: var(--success); }
 
-.status-msg.error { color: var(--danger); }
-.status-msg.success { color: var(--success); }
+    .timer-container {
+      margin: 24px 0;
+      padding: 24px;
+      background: #030712;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+    }
 
-/* Timer Display */
-.timer-container {
-margin: 24px 0;
-padding: 24px;
-background: #030712;
-border-radius: 12px;
-border: 1px solid var(--border);
-}
+    .timer-val {
+      font-size: 2.8rem;
+      font-weight: 800;
+      letter-spacing: -1px;
+      color: var(--accent);
+      font-variant-numeric: tabular-nums;
+      margin-bottom: 6px;
+    }
 
-.timer-val {
-font-size: 2.8rem;
-font-weight: 800;
-letter-spacing: -1px;
-color: var(--accent);
-font-variant-numeric: tabular-nums;
-margin-bottom: 6px;
-}
+    .timer-label {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-muted);
+    }
 
-.timer-label {
-font-size: 0.8rem;
-text-transform: uppercase;
-letter-spacing: 1px;
-color: var(--text-muted);
-}
+    .credentials-panel {
+      margin-top: 24px;
+      padding: 20px;
+      background: #030712;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      text-align: left;
+    }
 
-/* Result Panel */
-.credentials-panel {
-margin-top: 24px;
-padding: 20px;
-background: #030712;
-border-radius: 12px;
-border: 1px solid var(--border);
-text-align: left;
-}
+    .cred-row {
+      margin-bottom: 12px;
+    }
 
-.cred-row {
-margin-bottom: 12px;
-}
+    .cred-row:last-child {
+      margin-bottom: 0;
+    }
 
-.cred-row:last-child {
-margin-bottom: 0;
-}
+    .cred-title {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
 
-.cred-title {
-font-size: 0.75rem;
-text-transform: uppercase;
-color: var(--text-muted);
-font-weight: 700;
-letter-spacing: 0.5px;
-}
+    .cred-content {
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: #fff;
+      margin-top: 2px;
+      word-break: break-all;
+    }
 
-.cred-content {
-font-size: 1.15rem;
-font-weight: 600;
-color: #fff;
-margin-top: 2px;
-word-break: break-all;
-}
+    #qrcode {
+      margin: 20px auto 10px;
+      padding: 12px;
+      background: #fff;
+      border-radius: 8px;
+      width: fit-content;
+      display: flex;
+      justify-content: center;
+    }
 
-#qrcode {
-margin: 20px auto 10px;
-padding: 12px;
-background: #fff;
-border-radius: 8px;
-width: fit-content;
-display: flex;
-justify-content: center;
-}
-
-.hidden {
-display: none;
-}
-</style>
+    .hidden {
+      display: none;
+    }
+  </style>
 </head>
 <body>
 
 <div class="container">
-<div class="header-badge">Verification Node</div>
-<h1>Wi-Fi Authorization</h1>
+  <div class="header-badge">Verification Node</div>
+  <h1>Wi-Fi Authorization</h1>
 
-<!-- SCREEN 1: CODE INPUT -->
-<div id="screen-input">
-<p class="subtitle">Provide your authorization key to queue your encrypted Wi-Fi lease.</p>
-<div class="input-wrapper">
-<input type="text" id="passcodeInput" placeholder="•••••••••" maxlength="9" autocomplete="off" />
-</div>
-<button id="btnClaim" onclick="handleRedemption()">Validate Key</button>
-<div id="statusMessage" class="status-msg"></div>
-</div>
+  <!-- SCREEN 1: CODE INPUT -->
+  <div id="screen-input">
+    <p class="subtitle">Provide your authorization key to queue your Wi-Fi lease.</p>
+    <div class="input-wrapper">
+      <input type="text" id="passcodeInput" placeholder="•••••••••" maxlength="9" autocomplete="off" />
+    </div>
+    <button id="btnClaim" onclick="handleRedemption()">Validate Key</button>
+    <div id="statusMessage" class="status-msg"></div>
+  </div>
 
-<!-- SCREEN 2: DELAY TIMER -->
-<div id="screen-timer" class="hidden">
-<p class="subtitle">Access key validated. Encryption lock expires in:</p>
-<div class="timer-container">
-<div class="timer-val" id="timerValue">06:00:00</div>
-<div class="timer-label">Time Remaining</div>
-</div>
-<p class="subtitle" style="font-size: 0.8rem;">You can safely leave this tab or return later on this device.</p>
-</div>
+  <!-- SCREEN 2: DELAY TIMER -->
+  <div id="screen-timer" class="hidden">
+    <p class="subtitle">Access key validated. Lock expires in:</p>
+    <div class="timer-container">
+      <div class="timer-val" id="timerValue">06:00:00</div>
+      <div class="timer-label">Time Remaining</div>
+    </div>
+    <p class="subtitle" style="font-size: 0.8rem;">You can safely leave this tab or return later on this phone.</p>
+  </div>
 
-<!-- SCREEN 3: ACCESS UNLOCKED -->
-<div id="screen-result" class="hidden">
-<p class="subtitle" style="color: var(--success); font-weight: 600;">Access Granted & Decrypted</p>
-<div class="credentials-panel">
-<div class="cred-row">
-<div class="cred-title">Network Name (SSID)</div>
-<div class="cred-content" id="dispSsid">Wi-Fi</div>
-</div>
-<div class="cred-row">
-<div class="cred-title">Password</div>
-<div class="cred-content" id="dispPass">--</div>
-</div>
-</div>
-<div id="qrcode"></div>
-<p class="subtitle" style="font-size: 0.8rem; margin-top: 10px;">Scan QR to automatically connect</p>
-</div>
+  <!-- SCREEN 3: ACCESS UNLOCKED -->
+  <div id="screen-result" class="hidden">
+    <p class="subtitle" style="color: var(--success); font-weight: 600;">Access Granted</p>
+    <div class="credentials-panel">
+      <div class="cred-row">
+        <div class="cred-title">Network Name (SSID)</div>
+        <div class="cred-content" id="dispSsid">Wi-Fi</div>
+      </div>
+      <div class="cred-row">
+        <div class="cred-title">Password</div>
+        <div class="cred-content" id="dispPass">--</div>
+      </div>
+    </div>
+    <div id="qrcode"></div>
+    <p class="subtitle" style="font-size: 0.8rem; margin-top: 10px;">Scan QR to automatically connect</p>
+  </div>
 </div>
 
 <script>
-// ================= CONFIGURATION & CONSTANTS =================
-const LOCK_DURATION_HOURS = 6;
-const LOCK_DURATION_MS = LOCK_DURATION_HOURS * 60 * 60 * 1000;
-const SSID = "Wi-Fi";
-const CLEAR_PASS = "Intrak2026+";
+  // ================= BUCKET CONFIGURATION =================
+  // REPLACE THIS VALUE with your generated bucket ID (see Step 2 below)
+  const KVDB_BUCKET = "REPLACE_WITH_YOUR_BUCKET_ID";
 
-// Pre-hashed list of the 10 allowed 9-digit codes (SHA-256)
-const VALID_CODE_HASHES = [
-"a07361a91d17d2bb91515ef4081efb925b41cf434e320d3f8fba6368d3725b87", // 418920583
-"a66d8ba986e10df2bc55648a473f32420dbde780b43534b80b7d526fa1548810", // 739104826
-"c8a14ec410a514d79da93fae59a685dc4189ad99eefae0fca5df2f7c030c6a85", // 850291745
-"3fe32e4d0b04bfae6ba114e9ea98cececa1c08ff63e0e84b7df9452b453e1a06", // 193850274
-"9d1c151fe539b9bf8724ca52827a51dce93108baae0c86ee46f7f6a73cb7dd26", // 620481957
-"83a652a0d16be94fc05260ecbe4eb75066c1f1ec7e7428807d8858e99e46f6d6", // 947201835
-"e2ea329583b6326e5fc5f6ca5ff4125bdfa95c808f972b22bbbb36021669466e", // 382910475
-"6ecbaebce6b8df81cb3014022a84d4b1a415a774ea9884bbbbbe80a65349f7e7", // 501839274
-"8d56c5a0fb70cb5c6454e99f4ff893d957d383fbba31ea678c2e6f4e15cb98dc", // 274910385
-"a073f91578330e71f9fe7294ebca954e3fe72605f6bcae88402db237194fefbc" // 819305724
- ];
+  const LOCK_DURATION_HOURS = 6;
+  const LOCK_DURATION_MS = LOCK_DURATION_HOURS * 60 * 60 * 1000;
+  const SSID = "Wi-Fi";
+  const CLEAR_PASS = "Intrak2026+";
 
-// System codes
-const CODE_SETUP_BUCKET = "84920173"; // Bootstraps new bucket
-const CODE_RESET_CODES_ONLY = "11100011"; // Clears code usage, keeps bucket active
-const CODE_PURGE_BUCKET = "00040400"; // Clears codes AND detaches bucket
-const CODE_MASTER_UNLIMITED = "999888777"; // Infinite instant access
+  // SHA-256 hashes of the 10 valid codes
+  const VALID_CODE_HASHES = [
+    "a07361a91d17d2bb91515ef4081efb925b41cf434e320d3f8fba6368d3725b87", // 418920583
+    "a66d8ba986e10df2bc55648a473f32420dbde780b43534b80b7d526fa1548810", // 739104826
+    "c8a14ec410a514d79da93fae59a685dc4189ad99eefae0fca5df2f7c030c6a85", // 850291745
+    "3fe32e4d0b04bfae6ba114e9ea98cececa1c08ff63e0e84b7df9452b453e1a06", // 193850274
+    "9d1c151fe539b9bf8724ca52827a51dce93108baae0c86ee46f7f6a73cb7dd26", // 620481957
+    "83a652a0d16be94fc05260ecbe4eb75066c1f1ec7e7428807d8858e99e46f6d6", // 947201835
+    "e2ea329583b6326e5fc5f6ca5ff4125bdfa95c808f972b22bbbb36021669466e", // 382910475
+    "6ecbaebce6b8df81cb3014022a84d4b1a415a774ea9884bbbbbe80a65349f7e7", // 501839274
+    "8d56c5a0fb70cb5c6454e99f4ff893d957d383fbba31ea678c2e6f4e15cb98dc", // 274910385
+    "a073f91578330e71f9fe7294ebca954e3fe72605f6bcae88402db237194fefbc"  // 819305724
+  ];
 
-let countdownInterval = null;
+  // Special Action Codes
+  const CODE_RESET_CODES_ONLY = "11100011"; // Resets all 10 codes so they work again
+  const CODE_MASTER_UNLIMITED = "999888777"; // Instant unlimited bypass
 
-// ================= LIFECYCLE CHECK =================
-window.addEventListener("DOMContentLoaded", () => {
-const saved = localStorage.getItem("wifi_gateway_state");
-if (saved) {
-try {
-const state = JSON.parse(saved);
-if (state.unlockAt) {
-startCountdown(state.unlockAt);
-}
-} catch (e) {
-localStorage.removeItem("wifi_gateway_state");
-}
-}
-});
+  let countdownInterval = null;
 
-// ================= ACTION HANDLERS =================
-async function handleRedemption() {
-const input = document.getElementById("passcodeInput").value.trim();
-const btn = document.getElementById("btnClaim");
-setStatus("", "");
+  // On load: check if THIS specific phone already started a timer
+  window.addEventListener("DOMContentLoaded", () => {
+    const saved = localStorage.getItem("wifi_lock_target");
+    if (saved) {
+      const unlockAt = parseInt(saved, 10);
+      if (unlockAt) {
+        startCountdown(unlockAt);
+      }
+    }
+  });
 
-if (!input) return;
+  async function handleRedemption() {
+    const input = document.getElementById("passcodeInput").value.trim();
+    const btn = document.getElementById("btnClaim");
+    setStatus("", "");
 
-// 1. SETUP COMMAND: Provision new anonymous KVdb bucket
-if (input === CODE_SETUP_BUCKET) {
-btn.disabled = true;
-setStatus("Provisioning new anonymous KVdb bucket...", "");
-try {
-const res = await fetch("https://kvdb.io/", { method: "POST" });
-if (!res.ok) throw new Error("Could not acquire bucket from provider.");
-const bucketId = (await res.text()).trim();
-localStorage.setItem("wifi_kvdb_bucket", bucketId);
-setStatus(Bucket created & linked: ${bucketId}`, "success");
-} catch (err) {
-setStatus("Failed to create bucket. Check internet connection.", "error");
-} finally {
-btn.disabled = false;
-}
-return;
-}
+    if (!input) return;
 
-// 2. RESET CODES ONLY: Deletes used codes from bucket, bucket remains connected
-if (input === CODE_RESET_CODES_ONLY) {
-btn.disabled = true;
-const bucket = localStorage.getItem("wifi_kvdb_bucket");
-if (!bucket) {
-setStatus("No active bucket registered on this browser.", "error");
-btn.disabled = false;
-return;
-}
-setStatus("Clearing redeemed codes from bucket...", "");
-try {
-for (let hash of VALID_CODE_HASHES) {
-await fetch(https://kvdb.io/${bucket}/used_${hash}, { method: "DELETE" });
-}
-localStorage.removeItem("wifi_gateway_state");
-setStatus("All 10 codes are fresh and reusable again (Bucket kept).", "success");
-} catch (err) {
-setStatus("Error resetting code records.", "error");
-} finally {
-btn.disabled = false;
-}
-return;
-}
+    if (KVDB_BUCKET.includes("REPLACE_WITH")) {
+      setStatus("Error: Bucket ID not set in code!", "error");
+      return;
+    }
 
-// 3. PURGE COMMAND: Flush bucket keys & unbind bucket entirely
-if (input === CODE_PURGE_BUCKET) {
-btn.disabled = true;
-const bucket = localStorage.getItem("wifi_kvdb_bucket");
-if (!bucket) {
-setStatus("No active bucket registered on this browser.", "error");
-btn.disabled = false;
-return;
-}
-setStatus("Purging remote registry & bucket configuration...", "");
-try {
-for (let hash of VALID_CODE_HASHES) {
-await fetch(https://kvdb.io/${bucket}/used_${hash}, { method: "DELETE" });
-}
-localStorage.removeItem("wifi_kvdb_bucket");
-localStorage.removeItem("wifi_gateway_state");
-setStatus("Bucket flushed and completely detached.", "success");
-} catch (err) {
-setStatus("Error purging bucket contents.", "error");
-} finally {
-btn.disabled = false;
-}
-return;
-}
+    // 1. Reset all 10 codes
+    if (input === CODE_RESET_CODES_ONLY) {
+      btn.disabled = true;
+      setStatus("Resetting all codes in database...", "");
+      try {
+        for (let hash of VALID_CODE_HASHES) {
+          await fetch(`https://kvdb.io/${KVDB_BUCKET}/used_${hash}`, { method: "DELETE" });
+        }
+        localStorage.removeItem("wifi_lock_target");
+        setStatus("All 10 codes are now reusable.", "success");
+      } catch (err) {
+        setStatus("Error resetting codes.", "error");
+      } finally {
+        btn.disabled = false;
+      }
+      return;
+    }
 
-// 4. MASTER VIP CODE: Unlimited usage, immediate reveal
-if (input === CODE_MASTER_UNLIMITED) {
-revealCredentials();
-return;
-}
+    // 2. Master VIP bypass
+    if (input === CODE_MASTER_UNLIMITED) {
+      revealCredentials();
+      return;
+    }
 
-// 5. STANDARD 9-DIGIT CODES
-if (input.length !== 9) {
-setStatus("Please enter a valid 9-digit key.", "error");
-return;
-}
+    // 3. Normal 9-digit validation
+    if (input.length !== 9) {
+      setStatus("Code must be exactly 9 digits.", "error");
+      return;
+    }
 
-const inputHash = CryptoJS.SHA256(input).toString();
-if (!VALID_CODE_HASHES.includes(inputHash)) {
-setStatus("Unrecognized access code.", "error");
-return;
-}
+    const inputHash = CryptoJS.SHA256(input).toString();
+    if (!VALID_CODE_HASHES.includes(inputHash)) {
+      setStatus("Unrecognized code.", "error");
+      return;
+    }
 
-const bucket = localStorage.getItem("wifi_kvdb_bucket");
-if (!bucket) {
-setStatus("Error: System not configured. Enter setup code first.", "error");
-return;
-}
+    btn.disabled = true;
+    setStatus("Checking code status...", "");
 
-btn.disabled = true;
-setStatus("Verifying key allocation...", "");
+    try {
+      // Check if code was already redeemed on ANY phone
+      const checkRes = await fetch(`https://kvdb.io/${KVDB_BUCKET}/used_${inputHash}`);
+      if (checkRes.status === 200) {
+        setStatus("This code has already been redeemed!", "error");
+        btn.disabled = false;
+        return;
+      }
 
-try {
-const checkRes = await fetch(https://kvdb.io/${bucket}/used_${inputHash});
-if (checkRes.status === 200) {
-setStatus("This code has already been redeemed.", "error");
-btn.disabled = false;
-return;
-}
+      // Mark code as used in KVdb
+      const now = Date.now();
+      const claimRes = await fetch(`https://kvdb.io/${KVDB_BUCKET}/used_${inputHash}`, {
+        method: "PUT",
+        body: String(now)
+      });
 
-const now = Date.now();
-const claimRes = await fetch(https://kvdb.io/${bucket}/used_${inputHash}, {
-method: "PUT",
-body: JSON.stringify({ claimedAt: now })
-});
+      if (!claimRes.ok) throw new Error("Could not record code.");
 
-if (!claimRes.ok) throw new Error("Could not lock key on server.");
+      const targetUnlock = now + LOCK_DURATION_MS;
+      localStorage.setItem("wifi_lock_target", String(targetUnlock));
+      startCountdown(targetUnlock);
 
-const targetUnlock = now + LOCK_DURATION_MS;
-localStorage.setItem("wifi_gateway_state", JSON.stringify({ unlockAt: targetUnlock }));
-startCountdown(targetUnlock);
+    } catch (e) {
+      setStatus("Network error. Please try again.", "error");
+      btn.disabled = false;
+    }
+  }
 
-} catch (e) {
-setStatus("Network error during verification. Try again.", "error");
-btn.disabled = false;
-}
-}
+  function startCountdown(targetTimestamp) {
+    document.getElementById("screen-input").classList.add("hidden");
+    document.getElementById("screen-timer").classList.remove("hidden");
 
-// ================= TIMER & RENDERING =================
-function startCountdown(targetTimestamp) {
-document.getElementById("screen-input").classList.add("hidden");
-document.getElementById("screen-timer").classList.remove("hidden");
+    function tick() {
+      const now = Date.now();
+      const diff = Math.ceil((targetTimestamp - now) / 1000);
 
-function tick() {
-const now = Date.now();
-const diff = Math.ceil((targetTimestamp - now) / 1000);
+      if (diff <= 0) {
+        clearInterval(countdownInterval);
+        revealCredentials();
+        return;
+      }
 
-if (diff <= 0) {
-clearInterval(countdownInterval);
-revealCredentials();
-return;
-}
+      const hrs = Math.floor(diff / 3600).toString().padStart(2, "0");
+      const mins = Math.floor((diff % 3600) / 60).toString().padStart(2, "0");
+      const secs = (diff % 60).toString().padStart(2, "0");
+      document.getElementById("timerValue").innerText = `${hrs}:${mins}:${secs}`;
+    }
 
-const hrs = Math.floor(diff / 3600).toString().padStart(2, "0");
-const mins = Math.floor((diff % 3600) / 60).toString().padStart(2, "0");
-const secs = (diff % 60).toString().padStart(2, "0");
-document.getElementById("timerValue").innerText = ``${hrs}:{secs}`;
-}
+    tick();
+    countdownInterval = setInterval(tick, 1000);
+  }
 
-tick();
-countdownInterval = setInterval(tick, 1000);
-}
+  function revealCredentials() {
+    if (countdownInterval) clearInterval(countdownInterval);
 
-function revealCredentials() {
-if (countdownInterval) clearInterval(countdownInterval);
+    document.getElementById("screen-input").classList.add("hidden");
+    document.getElementById("screen-timer").classList.add("hidden");
+    document.getElementById("screen-result").classList.remove("hidden");
 
-document.getElementById("screen-input").classList.add("hidden");
-document.getElementById("screen-timer").classList.add("hidden");
-document.getElementById("screen-result").classList.remove("hidden");
+    document.getElementById("dispSsid").innerText = SSID;
+    document.getElementById("dispPass").innerText = CLEAR_PASS;
 
-document.getElementById("dispSsid").innerText = SSID;
-document.getElementById("dispPass").innerText = CLEAR_PASS;
+    const qrContainer = document.getElementById("qrcode");
+    qrContainer.innerHTML = "";
+    new QRCode(qrContainer, {
+      text: `WIFI:T:WPA;S:${SSID};P:${CLEAR_PASS};;`,
+      width: 160,
+      height: 160,
+      correctLevel: QRCode.CorrectLevel.M
+    });
+  }
 
-const qrContainer = document.getElementById("qrcode");
-qrContainer.innerHTML = "";
-new QRCode(qrContainer, {
-text: WIFI:T:WPA;S:${SSID};P:${CLEAR_PASS};;,
-width: 160,
-height: 160,
-correctLevel: QRCode.CorrectLevel.M
-});
-}
-
-function setStatus(msg, type) {
-const el = document.getElementById("statusMessage");
-el.innerText = msg;
-el.className = "status-msg " + type;
-}
+  function setStatus(msg, type) {
+    const el = document.getElementById("statusMessage");
+    el.innerText = msg;
+    el.className = "status-msg " + type;
+  }
 </script>
 
 </body>
